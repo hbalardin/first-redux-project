@@ -2,17 +2,17 @@
   "products": [
     {
       "id": 1,
-      "title": "Casaco maneiro",
+      "title": "Cool jacket",
       "price": 290.9
     },
     {
       "id": 2,
-      "title": "Óculos barato",
+      "title": "Cheap glasses",
       "price": 20.9
     },
     {
       "id": 3,
-      "title": "Tênis da moda",
+      "title": "Fashion shoes",
       "price": 500.0
     }
   ],
