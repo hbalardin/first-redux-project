@@ -1,3 +1,15 @@
+# MY NOTES
+
+## Flux Architecture
+
+![](github/flux-architecture.png)
+
+---
+
+# REDUX
+
+## Redux store
+
 Redux `store` it's like our global state for the app.
 
 ```typescript
@@ -8,6 +20,8 @@ import { createStore } from 'redux';
 const sharedData = 'Hello World!';
 export const store = createStore(sharedData);
 ```
+
+## Reducer
 
 Redux `reducer` it's like an isolated state of the app.
 A good practice for `reducers` it's to create an initial state and it's interfaces.
@@ -27,6 +41,8 @@ export const cart: Reducer<ICartState> = () => {
 };
 ```
 
+## Root reducer
+
 To set more than one `reducer` in our `store`, we can create a `rootReducer` and use `combineReducers` method to export them.
 
 ```typescript
@@ -45,10 +61,12 @@ import rootReducer from './modules/rootReducer';
 export const store = createStore(rootReducer);
 ```
 
+## Actions
+
 Redux `actions` are functions that call a `reducer`.
 An `action` must have a _`type`_ prop, and can have a _`payload`_ to send data to `reducer`.
 
-PS: The whole logic and business rules must be the responsibility of each `reducer`, each `action` is only responsible for calling a `reducer` and sending it data.
+PS: The whole logic and business rules must be the responsibility of each `reducer`. Each `action` is only responsible for calling a `reducer` and sending it data.
 
 ```typescript
 // /store/modules/cart/actions.ts
@@ -62,6 +80,8 @@ export function addProductToCart(product: IProduct) {
   };
 }
 ```
+
+## Calling a reducer with `useDispatch`
 
 To call this function properly, we had to use `useDispatch` hook.
 
@@ -87,6 +107,8 @@ export const Catalog = () => {
 };
 ```
 
+## Reducer props
+
 A `reducer` have two params: first the `store` current state, and second the `action` that have called this `reducer`.
 
 ```typescript
@@ -96,6 +118,8 @@ export const cart: Reducer<ICartState> = (state = INITIAL_STATE, action) => {
   return state;
 };
 ```
+
+## Why each action need a type?
 
 Remember that prop _`type`_ created in each `action`? That props it's used for `reducer` identify which function it have to execute.
 
@@ -115,6 +139,8 @@ export const cart: Reducer<ICartState> = (state = INITIAL_STATE, action) => {
   }
 };
 ```
+
+## Immutable concept and Immer
 
 Just like react states, we also have to use the `immutable` concept to change our redux state (`store`).
 There is a lib called `immer` that makes this proccess much easier. With `immer` you can write mutable code in a `draft` and the library convert the `draft` into a new immutable data for you.
@@ -143,6 +169,8 @@ return produce(state, (draft) => {
 });
 ```
 
+## Getting access to state data with `useSelector`
+
 We can access the global state data with redux `useSelector` method which receive a `callback` paramater and return the data that you specifies on callback (in this case `state.cart.item`).
 
 Also, it have two `dynamic params`, the first one represents the `global state type`, and the second one represent the callback `return type`.
@@ -155,6 +183,8 @@ const cart = useSelector<IState, ICartItem[]>((state) => state.cart.items);
 // global state type = IState
 // callback return type = ICartItem[]
 ```
+
+## Debugging with redux devtools
 
 We can use the browser extension `redux dev tools`, to debug our redux states. With this extension we have access to our redux calls, diffs between each call and also navigate into a timeline. To set-up this extension we just need to install the `redux-devtools-extension` library and add this code in our `store`.
 
