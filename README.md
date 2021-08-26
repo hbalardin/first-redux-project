@@ -48,6 +48,8 @@ export const store = createStore(rootReducer);
 Redux `actions` are functions that call a `reducer`.
 An `action` must have a _`type`_ prop, and can have a _`payload`_ to send data to `reducer`.
 
+PS: The whole logic and business rules must be the responsibility of each `reducer`, each `action` is only responsible for calling a `reducer` and sending it data.
+
 ```typescript
 // /store/modules/cart/actions.ts
 
@@ -146,8 +148,21 @@ We can access the global state data with redux `useSelector` method which receiv
 Also, it have two `dynamic params`, the first one represents the `global state type`, and the second one represent the callback `return type`.
 
 ```typescript
+// /components/Cart
+
 const cart = useSelector<IState, ICartItem[]>((state) => state.cart.items);
 
 // global state type = IState
 // callback return type = ICartItem[]
+```
+
+We can use the browser extension `redux dev tools`, to debug our redux states. With this extension we have access to our redux calls, diffs between each call and also navigate into a timeline. To set-up this extension we just need to install the `redux-devtools-extension` library and add this code in our `store`.
+
+```typescript
+// /store
+
+import { createStore } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+export const store = createStore(rootReducer, composeWithDevTools());
 ```
