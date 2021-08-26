@@ -261,3 +261,36 @@ export const store = createStore(
 
 sagaMiddleware.run(rootSaga);
 ```
+
+## Actions patterns
+
+To keep `actions` organized and also be possible to use `sagas` in a better way. You can separate each `action` in three parts, one for the action `request`, another for `success` and another for `failure`.
+
+```typescript
+export enum ActionTypes {
+  addProductToCartRequest = 'ADD_PRODUCT_TO_CART_REQUEST',
+  addProductToCartSuccess = 'ADD_PRODUCT_TO_CART_SUCCESS',
+  addProductToCartFailure = 'ADD_PRODUCT_TO_CART_FAILURE',
+}
+
+export function addProductToCartRequest(product: IProduct) {
+  return {
+    type: ActionTypes.addProductToCartRequest,
+    payload: { product },
+  };
+}
+
+export function addProductToCartSuccess(product: IProduct) {
+  return {
+    type: ActionTypes.addProductToCartSuccess,
+    payload: { product },
+  };
+}
+
+export function addProductToCartFailure(productId: number) {
+  return {
+    type: ActionTypes.addProductToCartFailure,
+    payload: { productId },
+  };
+}
+```
