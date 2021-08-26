@@ -294,3 +294,49 @@ export function addProductToCartFailure(productId: number) {
   };
 }
 ```
+
+## Saga methods
+
+Whenever you use any `saga` methods, you need to use `yield` before calling it. Here some useful methods.
+
+### `call`
+
+It is used to call api's or promises in general. Receive the api method as first param and it's url as second param.
+
+```typescript
+const availableStockResponse: AxiosResponse<IStockResponse> = yield call(
+  api.get,
+  `stock/${product.id}`
+);
+```
+
+### `put`
+
+It is similar to `dispatch`, it's used to call an `action`.
+
+```typescript
+yield put(addProductToCartSuccess(product));
+```
+
+### `select`
+
+Used to get data from redux global state.
+
+```typescript
+const currentQuantity: number = yield select((state: IState) => {
+  return (
+    state.cart.items.find((item) => item.product.id === product.id)?.quantity ??
+    0
+  );
+});
+```
+
+### `all`
+
+It's similar to `promise.all` method. It is used to call more than one saga method at the same time.
+
+```typescript
+export default all([
+  takeLatest(ActionTypes.addProductToCartRequest, checkProductStock),
+]);
+```
