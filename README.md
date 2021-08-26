@@ -2,7 +2,7 @@
 
 ## Flux Architecture
 
-![](github/flux-architecture.png)
+![Flux Architecture](github/flux-architecture.png)
 
 ---
 
@@ -195,4 +195,69 @@ import { createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 export const store = createStore(rootReducer, composeWithDevTools());
+```
+
+---
+
+# REDUX SAGA
+
+Redux `saga` it's responsible for manage middlewares that can intercept `actions` before they call `reducers`.
+
+## Creating sagas
+
+When you call an `action` more than once and the first call didn't finish yet, you can choose how your `middleware` will work. Here some examples:
+
+- `takeLatest`: run for the latest and discard the rest.
+- `takeLeading`: run for the first and discard the rest.
+- `takeEvery`: run for the each call.
+
+Each `take` receive two params, the first one is the prop type of an `action` that will be watched and the second one is the function that will be called.
+
+```typescript
+// /store/modules/cart/sagas.ts
+
+import { all, takeLatest } from 'redux-saga/effects';
+
+function checkProductStock() {
+  console.log('intercept "ADD_PRODUCT_TO_CART" action');
+}
+
+export default all([takeLatest('ADD_PRODUCT_TO_CART', checkProductStock)]);
+```
+
+## Add saga middlewares to store
+
+Just like `reducers`, we can also create different sagas and joining then into a `rootSaga`.
+
+PS: `function*` is similar to an `async function` and `yield` is similar to an `await`.
+
+```typescript
+// /store/modules/rootSaga.ts
+
+import { all } from 'redux-saga/effects';
+
+import cart from './cart/sagas';
+
+export default function* rootSaga() {
+  return yield all([cart]);
+}
+
+// /store
+
+import { applyMiddleware, createStore } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import createSagaMiddleware from 'redux-saga';
+
+import rootReducer from './modules/rootReducer';
+import rootSaga from './modules/rootSaga';
+
+const sagaMiddleware = createSagaMiddleware();
+const middlewares = [sagaMiddleware];
+
+export const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(...middlewares))
+);
+
+sagaMiddleware.run(rootSaga);
 ```
