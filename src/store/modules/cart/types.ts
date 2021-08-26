@@ -1,3 +1,7 @@
+export enum ActionTypes {
+  addProductToCart = 'ADD_PRODUCT_TO_CART',
+}
+
 export interface IProduct {
   id: number;
   title: string;
