@@ -1,12 +1,12 @@
-# MY NOTES
+# REDUX
 
-## Flux Architecture
+# 📒 My Notes
+
+## Flux Architecture example:
 
 ![Flux Architecture](github/flux-architecture.png)
 
----
-
-# REDUX
+First read the concepts above, then look at the project flow in the end of document ([or click here to check](#-FLOW)).
 
 ## Redux store
 
@@ -169,7 +169,7 @@ return produce(state, (draft) => {
 });
 ```
 
-## Getting access to state data with `useSelector`
+## Getting access to global state data with `useSelector`
 
 We can access the global state data with redux `useSelector` method which receive a `callback` paramater and return the data that you specifies on callback (in this case `state.cart.item`).
 
@@ -340,3 +340,10 @@ export default all([
   takeLatest(ActionTypes.addProductToCartRequest, checkProductStock),
 ]);
 ```
+
+## 🧭 FLOW
+
+1. List of products -> user clicks on "buy" button -> call a handler function
+2. Handler function -> `dispatch` a `request action` -> intercepted by `saga middleware` -> checks stock.
+3. If has stock -> dispatch a `successful action` -> cart `reducer` add product to cart.
+4. Else -> dispatch a `failure action` -> cart `reducer` add "out of stock" message at product list.
