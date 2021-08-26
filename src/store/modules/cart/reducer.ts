@@ -4,12 +4,13 @@ import { ActionTypes, ICartState } from './types';
 
 const INITIAL_STATE: ICartState = {
   items: [],
+  failedOnStockCheck: [],
 };
 
 export const cart: Reducer<ICartState> = (state = INITIAL_STATE, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
-      case ActionTypes.addProductToCart: {
+      case ActionTypes.addProductToCartSuccess: {
         const { product } = action.payload;
 
         const productInCartIndex = draft.items.findIndex(
@@ -24,6 +25,13 @@ export const cart: Reducer<ICartState> = (state = INITIAL_STATE, action) => {
             quantity: 1,
           });
         }
+        break;
+      }
+      case ActionTypes.addProductToCartFailure: {
+        const { productId } = action.payload;
+
+        draft.failedOnStockCheck.push(productId);
+
         break;
       }
       default: {
