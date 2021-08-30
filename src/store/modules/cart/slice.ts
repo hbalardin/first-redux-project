@@ -25,7 +25,7 @@ const cartSlice = createSlice({
         });
       }
     },
-    addProductToCartRejected(state, action) {
+    addProductToCartRejected(state, action: PayloadAction<number>) {
       const productId = action.payload;
 
       state.failedOnStockCheck.push(productId);
