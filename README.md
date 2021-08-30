@@ -1,12 +1,15 @@
-# REDUX
+# ⚛️ REDUX NOTES ⚛️
 
-# 📒 My Notes
+Those notes above are all about redux concepts and how to use it in a pure way. If you already know about redux concepts [click here](#-redux-toolkit-notes) to check my notes about [redux toolkit](https://redux-toolkit.js.org/) and be more productive.
 
-## Flux Architecture example:
+## 🧭 FLOW
 
 ![Flux Architecture](github/flux-architecture.png)
 
-First read the concepts above, then look at the project flow in the end of document ([or click here to check](#-FLOW)).
+1. List of products -> user clicks on "buy" button -> call a handler function
+2. Handler function -> `dispatch` a `request action` -> intercepted by `saga middleware` -> checks stock.
+3. If has stock -> dispatch a `successful action` -> cart `reducer` add product to cart.
+4. Else -> dispatch a `failure action` -> cart `reducer` add "out of stock" message at product list.
 
 ## Redux store
 
@@ -341,9 +344,105 @@ export default all([
 ]);
 ```
 
-## 🧭 FLOW
+# ⚛️ REDUX TOOLKIT NOTES ⚛️
 
-1. List of products -> user clicks on "buy" button -> call a handler function
-2. Handler function -> `dispatch` a `request action` -> intercepted by `saga middleware` -> checks stock.
-3. If has stock -> dispatch a `successful action` -> cart `reducer` add product to cart.
-4. Else -> dispatch a `failure action` -> cart `reducer` add "out of stock" message at product list.
+Redux toolkit is a librabry used to improve our productivity with redux and react-redux.
+We do not need to set-up a lot of configurations with this library, also we can write a cleaner and simple code.
+
+### Install
+
+Using `redux toolkit`, we don't have to install `immer` and `redux saga`, because the library already has included `immer` and `redux-thunk`. Redux thunk it's different than redux-saga, but both can do what we need (manage async middlewares for redux).
+
+```bash
+yarn remove immer redux-saga
+yarn add @reduxjs/toolkit
+```
+
+## Setting-up project
+
+To setup a redux project, we need to configure our `store`, create a reducer and his actions.
+
+To make this things easier, we can create a `slice` instead a reducer and actions. With `slice`, a reducer and his actions are creted at the same function.
+
+PS: Export our actions with named export and the reducer with export default is a pattern (duck pattern).
+
+```typescript
+const cartSlice = createSlice({
+  name: 'reducerName',
+  initialState,
+  reducers: {
+    actionName(state, action: PayloadAction<IProduct>) {
+      // reducer code.
+    },
+    anotherActionName(state, action: PayloadAction<number>) {
+      // reducer code
+    },
+  },
+});
+
+// exporting actions
+export const { addProductToCartFulfilled, addProductToCartRejected } =
+  cartSlice.actions;
+
+// exporting reducer
+export default cartSlice.reducer;
+```
+
+### Store and types
+
+Once that it's done, we can create our store. This way, is a lot easier than without redux-toolkit. If we are using typescript it's important to create a type for the store `state` and for our `dispatch`.
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+import cart from './modules/cart/slice';
+
+export const store = configureStore({
+  reducer: {
+    cart,
+  },
+});
+
+export type IState = ReturnType<typeof store.getState>;
+export type IDispatch = typeof store.dispatch;
+```
+
+To use the best of typescript, we need to type our selector and dispatch whenever we use them. But to make things easier, we can create a custom hook for those functions and make them pre-typed.
+
+```typescript
+import { TypedUseSelectorHook, useSelector, useDispatch } from 'react-redux';
+import { IDispatch, IState } from '../../store';
+
+// Use throughout your app instead of plain `useDispatch` and `useSelector`
+export const useAppDispatch = () => useDispatch<IDispatch>();
+export const useAppSelector: TypedUseSelectorHook<IState> = useSelector;
+```
+
+## Thunks
+
+Instead of using `redux-saga`, we can use `redux-thunks` to call async function before call a reducer. With thunks, we create an `async` function (that would be called by an action) that has two params, first is his name, and second a callback. This callback has other two params. The first one is the action payload, and the second one (optional) is for `thunkApi`. Whenever we need to use our redux store data, we'll need to use `thunkApi` to get this informations inside this function. We can use thunkApi `selectors`, `dispatch` and other things.
+
+```typescript
+export const addProductToCartPending = createAsyncThunk<
+  void,
+  IProduct,
+  { state: IState }
+>('cart/checkProductStock', async (product: IProduct, thunkApi) => {
+  const currentQuantity =
+    thunkApi
+      .getState()
+      .cart.items.find((item) => item.product.id === product.id)?.quantity ?? 0;
+
+  const availableStockResponse = await api.get<IStockResponse>(
+    `stock/${product.id}`
+  );
+
+  const hasAvailableStock =
+    availableStockResponse.data.quantity > currentQuantity;
+
+  if (hasAvailableStock) {
+    thunkApi.dispatch(addProductToCartFulfilled(product));
+  } else {
+    thunkApi.dispatch(addProductToCartRejected(product.id));
+  }
+});
+```
